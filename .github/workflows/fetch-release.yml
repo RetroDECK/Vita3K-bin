@@ -25,16 +25,16 @@ jobs:
       id: fetch_release
       run: |
         latest_release=$(curl -s https://api.github.com/repos/Vita3K/Vita3K/releases/latest)
-        echo "::set-output name=tag_name::$(echo $latest_release | jq -r .tag_name)"
-        echo "::set-output name=release_body::$(echo $latest_release | jq -r .body)"
-        echo "::set-output name=assets::$(echo $latest_release | jq -r '.assets[] | .browser_download_url')"
+        echo "tag_name=$(echo $latest_release | jq -r .tag_name)" >> $GITHUB_ENV
+        echo "release_body=$(echo $latest_release | jq -r .body)" >> $GITHUB_ENV
+        echo "assets=$(echo $latest_release | jq -r '.assets[] | .browser_download_url')" >> $GITHUB_ENV
         release_name=$(echo $latest_release | jq -r .body | grep -oP 'Vita3K Build: \d+')
-        echo "::set-output name=release_name::$release_name"
+        echo "release_name=$release_name" >> $GITHUB_ENV
 
     - name: Download assets
       run: |
         mkdir -p artifacts
-        for url in ${{ steps.fetch_release.outputs.assets }}; do
+        for url in ${{ env.assets }}; do
           wget -P artifacts $url
         done
 
@@ -44,9 +44,9 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.event.inputs.tag_name || format('YYYYMMDD-HHmmss', github.event.inputs['time']) }}
-        release_name: ${{ steps.fetch_release.outputs.release_name }}
-        body: ${{ steps.fetch_release.outputs.release_body }}
+        tag_name: ${{ env.tag_name || format('YYYYMMDD-HHmmss', github.event.inputs['time']) }}
+        release_name: ${{ env.release_name }}
+        body: ${{ env.release_body }}
         draft: false
         prerelease: false
 
