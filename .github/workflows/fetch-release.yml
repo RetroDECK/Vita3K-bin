@@ -30,7 +30,7 @@ jobs:
 
         # fetching assets
         mkdir -p artifacts
-        for url in "$(echo $latest_release | jq -r '.assets[] | .browser_download_url')"; do
+        for url in $(echo $latest_release | jq -r '.assets[] | .browser_download_url'); do
           wget -P artifacts $url
         done
 
@@ -41,7 +41,6 @@ jobs:
 
         echo "tag_name=$tag_name" >> $GITHUB_ENV
         echo "release_body=$release_body" >> $GITHUB_ENV
-        echo "assets=$assets" >> $GITHUB_ENV
         echo "release_name=$release_name" >> $GITHUB_ENV
         
     - name: Create release in this repository
