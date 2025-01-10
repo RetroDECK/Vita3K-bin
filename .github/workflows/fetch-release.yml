@@ -25,10 +25,19 @@ jobs:
       id: fetch_release
       run: |
         latest_release=$(curl -s https://api.github.com/repos/Vita3K/Vita3K/releases/latest)
-        echo "tag_name=$(echo $latest_release | jq -r .tag_name)" >> $GITHUB_ENV
-        echo "release_body=$(echo $latest_release | jq -r .body)" >> $GITHUB_ENV
-        echo "assets=$(echo $latest_release | jq -r '.assets[] | .browser_download_url')" >> $GITHUB_ENV
+        echo "tag_name=$(echo $latest_release | jq -r .tag_name)"
+        echo "release_body=$(echo $latest_release | jq -r .body)"
+        echo "assets=$(echo $latest_release | jq -r '.assets[] | .browser_download_url')"
         release_name=$(echo $latest_release | jq -r .body | grep -oP 'Vita3K Build: \d+')
+        echo "release_name=$release_name"
+        commit_hash=$(echo $latest_release | jq -r .body | grep -oP 'corresponding commit \K[0-9a-f]{40}')
+        if [ -n "$commit_hash" ]; then
+          release_body=$(echo $latest_release | jq -r .body | sed "s/corresponding commit $commit_hash/corresponding commit https:\/\/github.com\/Vita3K\/Vita3K\/commit\/$commit_hash/")
+          echo "release_body=$release_body"
+        fi
+        echo "tag_name=$tag_name" >> $GITHUB_ENV
+        echo "release_body=$release_body" >> $GITHUB_ENV
+        echo "assets=$assets" >> $GITHUB_ENV
         echo "release_name=$release_name" >> $GITHUB_ENV
 
     - name: Download assets
