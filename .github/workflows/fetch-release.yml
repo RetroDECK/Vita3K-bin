@@ -41,7 +41,7 @@ jobs:
         commit_hash="$(echo $latest_release | jq -r .body | grep -oP 'Corresponding commit: \K[0-9a-f]{40}')"
         echo "commit_hash=$commit_hash"
 
-        release_body+="Corresponding commit: [$commit_hash](https://github.com/Vita3K/Vita3K/commit/$commit_hash)\n\n"
+        release_body+="Corresponding commit: [$commit_hash](https://github.com/Vita3K/Vita3K/commit/$commit_hash)</br>"
         release_body+="$release_name" 
         echo "release_body=$release_body"
 
