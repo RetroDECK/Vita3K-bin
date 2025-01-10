@@ -37,9 +37,7 @@ jobs:
         release_name="$(echo $latest_release | jq -r .body | grep -oP 'Vita3K Build: \d+' | sed 's/Vita3K Build: /Vita3K - Build /')"
 
         commit_hash="$(echo $latest_release | jq -r .body | grep -oP 'Corresponding commit: \K[0-9a-f]{40}')"
-        if [ -n "$commit_hash" ]; then
-          release_body+="\n\nCorresponding commit: [$commit_hash](https://github.com/Vita3K/Vita3K/commit/$commit_hash)"
-        fi
+        release_body+="\n\nCorresponding commit: [$commit_hash](https://github.com/Vita3K/Vita3K/commit/$commit_hash)"
 
         echo "tag_name=$tag_name" >> $GITHUB_ENV
         echo "release_body=$release_body" >> $GITHUB_ENV
