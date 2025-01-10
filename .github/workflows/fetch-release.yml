@@ -25,6 +25,8 @@ jobs:
         echo "::set-output name=tag_name::$(echo $latest_release | jq -r .tag_name)"
         echo "::set-output name=release_body::$(echo $latest_release | jq -r .body)"
         echo "::set-output name=assets::$(echo $latest_release | jq -r '.assets[] | .browser_download_url')"
+        release_name=$(echo $latest_release | jq -r .body | grep -oP 'Vita3K Build: \d+')
+        echo "::set-output name=release_name::$release_name"
 
     - name: Download assets
       run: |
@@ -40,10 +42,11 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: $(date +'%Y-%m-%d')
-        release_name: ""
+        release_name: ${{ steps.fetch_release.outputs.release_name }}
         body: ${{ steps.fetch_release.outputs.release_body }}
         draft: false
         prerelease: false
+        latest: true
 
     - name: Upload assets to the new release
       uses: actions/upload-release-asset@v1
