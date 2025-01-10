@@ -34,7 +34,7 @@ jobs:
           wget -P artifacts $url
         done
 
-        release_name=$(echo $latest_release | jq -r .body | grep -oP 'Vita3K Build \d+')
+        release_name=$(echo $latest_release | jq -r .body | grep -oP 'Vita3K Build: \d+' | sed 's/Vita3K Build: /Vita3K Build /')
         echo "release_name=$release_name"
         commit_hash=$(echo $latest_release | jq -r .body | grep -oP 'corresponding commit \K[0-9a-f]{40}')
         if [ -n "$commit_hash" ]; then
