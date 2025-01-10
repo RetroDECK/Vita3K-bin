@@ -67,6 +67,5 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: artifacts/$(basename $asset_path)
-        asset_name: $(basename $asset_path)
+        asset_path: artifacts/*
         asset_content_type: application/octet-stream
