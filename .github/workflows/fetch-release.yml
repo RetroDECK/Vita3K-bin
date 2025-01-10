@@ -27,7 +27,13 @@ jobs:
         latest_release=$(curl -s https://api.github.com/repos/Vita3K/Vita3K/releases/latest)
         echo "tag_name=$(echo $latest_release | jq -r .tag_name)"
         echo "release_body=$(echo $latest_release | jq -r .body)"
-        echo "assets=$(echo $latest_release | jq -r '.assets[] | .browser_download_url')"
+
+        # fetching assets
+        mkdir -p artifacts
+        for url in "$(echo $latest_release | jq -r '.assets[] | .browser_download_url')"; do
+          wget -P artifacts $url
+        done
+
         release_name=$(echo $latest_release | jq -r .body | grep -oP 'Vita3K Build: \d+')
         echo "release_name=$release_name"
         commit_hash=$(echo $latest_release | jq -r .body | grep -oP 'corresponding commit \K[0-9a-f]{40}')
@@ -39,14 +45,7 @@ jobs:
         echo "release_body=$release_body" >> $GITHUB_ENV
         echo "assets=$assets" >> $GITHUB_ENV
         echo "release_name=$release_name" >> $GITHUB_ENV
-
-    - name: Download assets
-      run: |
-        mkdir -p artifacts
-        for url in ${{ env.assets }}; do
-          wget -P artifacts $url
-        done
-
+        
     - name: Create release in this repository
       id: create_release
       uses: actions/create-release@v1
