@@ -44,7 +44,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: $(date +'%Y-%m-%d')
+        tag_name: ${{ github.event.inputs.tag_name || format('YYYYMMDD-HHmmss', github.event.inputs['time']) }}
         release_name: ${{ steps.fetch_release.outputs.release_name }}
         body: ${{ steps.fetch_release.outputs.release_body }}
         draft: false
