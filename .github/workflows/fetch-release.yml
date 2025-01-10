@@ -1,0 +1,56 @@
+name: Fetch and Publish Latest Release
+
+on:
+    schedule:
+        - cron: '0 18 * * *' # 3:00 AM GMT+9
+    workflow_dispatch:
+        inputs:
+            tag_name:
+                description: 'Tag name for the manual release'
+                required: true
+                default: 'YYYYMMDD-manual-HHMMSS'
+
+jobs:
+  fetch-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout this repository
+      uses: actions/checkout@v2
+
+    - name: Fetch latest release from Vita3K
+      id: fetch_release
+      run: |
+        latest_release=$(curl -s https://api.github.com/repos/Vita3K/Vita3K/releases/latest)
+        echo "::set-output name=tag_name::$(echo $latest_release | jq -r .tag_name)"
+        echo "::set-output name=release_body::$(echo $latest_release | jq -r .body)"
+        echo "::set-output name=assets::$(echo $latest_release | jq -r '.assets[] | .browser_download_url')"
+
+    - name: Download assets
+      run: |
+        mkdir -p artifacts
+        for url in ${{ steps.fetch_release.outputs.assets }}; do
+          wget -P artifacts $url
+        done
+
+    - name: Create release in this repository
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: $(date +'%Y-%m-%d')
+        release_name: ""
+        body: ${{ steps.fetch_release.outputs.release_body }}
+        draft: false
+        prerelease: false
+
+    - name: Upload assets to the new release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: artifacts/
+        asset_name: $(basename $asset_path)
+        asset_content_type: application/octet-stream
