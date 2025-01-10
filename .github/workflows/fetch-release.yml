@@ -11,7 +11,7 @@ on:
                 default: 'YYYYMMDD-manual-HHMMSS'
     push:
         branches:
-            - master
+            - main
 
 jobs:
   fetch-and-publish:
