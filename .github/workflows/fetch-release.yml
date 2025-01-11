@@ -69,3 +69,13 @@ jobs:
         done
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Check for ubuntu-latest.zip and delete release if not found
+      run: |
+        if ! ls artifacts | grep -q 'ubuntu-latest.zip'; then
+          echo "ubuntu-latest.zip not found. Deleting release..."
+          gh release delete ${{ env.tag_name }} --yes
+          exit 1
+        fi
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
