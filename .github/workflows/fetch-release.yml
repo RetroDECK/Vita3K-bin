@@ -8,7 +8,7 @@ on:
             tag_name:
                 description: 'Tag name for the manual release'
                 required: true
-                default: 'YYYYMMDD-manual-HHMMSS'
+                default: "manual"
     push:
         branches:
             - main
@@ -45,6 +45,9 @@ jobs:
         release_body+="$release_name" 
         echo "release_body=$release_body"
 
+        build_number="${release_name//Vita3K - Build /}"
+        echo "build_number=$build_number" >> $GITHUB_ENV
+
         echo "tag_name=$tag_name" >> $GITHUB_ENV
         echo "release_body=$release_body" >> $GITHUB_ENV
         echo "release_name=$release_name" >> $GITHUB_ENV
@@ -55,7 +58,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.run_id }}
+        tag_name: ${{ env.build_number }}
         release_name: ${{ env.release_name }}
         body: ${{ env.release_body }}
         draft: false
