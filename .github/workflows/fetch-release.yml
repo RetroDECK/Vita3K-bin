@@ -68,7 +68,7 @@ jobs:
       run: |
         for file in artifacts/*; do
           echo "Uploading $file..."
-          gh release upload ${{ env.tag_name }} "$file" --clobber
+          gh release upload ${{ env.build_number }} "$file" --clobber
         done
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -77,7 +77,7 @@ jobs:
       run: |
         if ! ls artifacts | grep -q 'ubuntu-latest.zip'; then
           echo "ubuntu-latest.zip not found. Deleting release..."
-          gh release delete ${{ env.tag_name }} --yes
+          gh release delete ${{ env.build_number }} --yes
           exit 1
         fi
       env:
