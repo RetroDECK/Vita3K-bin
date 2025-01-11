@@ -55,7 +55,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ format('YYYYMMDD-HHmmss', github.event.inputs['time']) }}
+        tag_name: ${{ github.run_id }}
         release_name: ${{ env.release_name }}
         body: ${{ env.release_body }}
         draft: false
